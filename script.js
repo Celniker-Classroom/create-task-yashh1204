@@ -1,49 +1,58 @@
-// ROW 2: DATA ABSTRACTION
-// This list stores the assignment objects.
-let assignmentList = []; 
+// ROW 2: DATA ABSTRACTION 
+let gradeList = [];
 
-function addEntry() {
-    let n = document.getElementById("name").value;
-    let s = parseFloat(document.getElementById("score").value);
-    let w = parseFloat(document.getElementById("weight").value);
+function addAssignment() {
+    let name = document.getElementById("assignName").value;
+    let score = parseFloat(document.getElementById("assignScore").value);
+    let weight = parseFloat(document.getElementById("assignWeight").value);
 
-    if (n !== "" && !isNaN(s) && !isNaN(w)) {
-        // Storing data in the list
-        let newObject = { name: n, score: s, weight: w };
-        assignmentList.push(newObject);
+    if (name !== "" && !isNaN(score) && !isNaN(weight)) {
+        // Storing data as an object in the list
+        let newEntry = { "title": name, "pts": score, "pct": weight };
+        gradeList.push(newEntry);
+
+        updateUI();
         
-        // ROW 4: Calling the procedure with a parameter
-        let total = calculateGrade(assignmentList);
-        
-        // Update the UI
-        document.getElementById("finalGrade").innerText = total;
-        document.getElementById("listDisplay").innerText = assignmentList.length + " items added";
+        // Clear inputs
+        document.getElementById("assignName").value = "";
+        document.getElementById("assignScore").value = "";
+        document.getElementById("assignWeight").value = "";
+    } else {
+        alert("Please enter a name, score, and weight!");
     }
 }
 
-// ROW 4 & 5: PROCEDURAL ABSTRACTION & ALGORITHM IMPLEMENTATION
-// This function uses sequencing, selection, and iteration.
-function calculateGrade(dataList) {
-    let weightedSum = 0;
-    let totalWeight = 0;
+// ROW 4: PROCEDURAL ABSTRACTION (Function with parameter)
+function calculateFinal(list) {
+    let weightedTotal = 0;
+    let weightSum = 0;
 
-    // ITERATION: Traverses the list
-    for (let i = 0; i < dataList.length; i++) {
-        let currentScore = dataList[i].score;
-        let currentWeight = dataList[i].weight;
+    // ROW 5: ALGORITHM IMPLEMENTATION (Iteration + Selection + Sequencing)
+    for (let i = 0; i < list.length; i++) {
+        let s = list[i].pts;
+        let w = list[i].pct;
 
-        // SELECTION: Ensures math only runs on valid weights
-        if (currentWeight > 0) {
-            // SEQUENCING: The math happens in order
-            weightedSum += (currentScore * (currentWeight / 100));
-            totalWeight += currentWeight;
+        if (w > 0) {
+            weightedTotal += (s * (w / 100));
+            weightSum += w;
         }
     }
 
-    // Final selection to avoid division by zero
-    if (totalWeight === 0) {
-        return 0;
-    } else {
-        return (weightedSum / (totalWeight / 100)).toFixed(2);
+    if (weightSum === 0) return 0;
+    return (weightedTotal / (weightSum / 100)).toFixed(2);
+}
+
+function updateUI() {
+    // Calling the procedure
+    let finalResult = calculateFinal(gradeList);
+    document.getElementById("displayGrade").innerText = finalResult;
+    
+    // Updated display to show the weighting as requested
+    let logDiv = document.getElementById("log");
+    logDiv.innerHTML = "<strong>List Contents:</strong><br>";
+    
+    for(let j = 0; j < gradeList.length; j++) {
+        // This line now shows the title, the score, AND the weight
+        logDiv.innerHTML += gradeList[j].title + ": " + gradeList[j].pts + "% (Weight: " + gradeList[j].pct + "%)<br>";
     }
 }
