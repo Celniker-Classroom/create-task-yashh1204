@@ -18,9 +18,17 @@
 <div class="container">
     <h2>My Gradebook</h2>
     
-    <input type="text" id="assignName" placeholder="Assignment Name">
-    <input type="number" id="assignScore" placeholder="Score (0-100)">
-    <input type="number" id="assignWeight" placeholder="Weight (%)">
+    <div class="section">
+        <input type="text" id="catName" placeholder="Category Name (e.g., Tests)">
+        <input type="number" id="catWeight" placeholder="Category Weight (%)">
+        <button onclick="addCategory()">Add Category</button>
+        <p id="weightStatus">Total Weight: 0%</p>
+    </div>
+
+    <h2>2. Add Assignments</h2>
+    <select id="catSelect"><option value="">--Select Category--</option></select>
+    <input type="text" id="asName" placeholder="Assignment Name">
+    <input type="number" id="asScore" placeholder="Score (0-100)">
     
     <button onclick="addAssignment()">Add to List</button>
 
