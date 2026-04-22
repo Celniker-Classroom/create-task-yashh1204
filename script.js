@@ -1,7 +1,7 @@
 let categories = []; 
 let assignments = []; 
 
-// New function to handle category creation
+//  category creation
 function addCategory() {
     let name = document.getElementById("catName").value;
     let weight = parseFloat(document.getElementById("catWeight").value);
@@ -21,15 +21,16 @@ function addAssignment() {
 
     // Logic: Check if category is selected and fields are filled
     if (cat !== "" && name !== "" && !isNaN(score)) {
-        // ROW 2: Adding an object to the assignments list
+
         let newEntry = { 
+            id: Date.now(),
             category: cat, 
             name: name, 
             score: score 
         };
         assignments.push(newEntry);
 
-        // Update the screen and math
+        // updates the UI lol
         updateUI();
         
         // Clear inputs for the next one
@@ -40,18 +41,18 @@ function addAssignment() {
     }
 }
 
-// ROW 4: PROCEDURAL ABSTRACTION (Function with parameter)
+// calculated the final grade
 function calculateFinal(catList, asList) {
     let finalScore = 0;
 
-    // OUTER ITERATION: Loops through categories
+
     for (let i = 0; i < catList.length; i++) {
         let currentCat = catList[i].name;
         let catWeight = catList[i].weight / 100;
         let catSum = 0;
         let count = 0;
 
-        // INNER ITERATION: Loops through assignments to find matches
+
         for (let j = 0; j < asList.length; j++) {
             if (asList[j].category === currentCat) {
                 catSum += asList[j].score;
@@ -68,14 +69,19 @@ function calculateFinal(catList, asList) {
 }
 
 function updateUI() {
- // Calling the procedure with TWO parameters now
+ 
     let finalResult = calculateFinal(categories, assignments);
     document.getElementById("displayGrade").innerText = finalResult;
     
     let logDiv = document.getElementById("log");
     logDiv.innerHTML = "<strong>Assignments added:</strong><br>";
     for(let k = 0; k < assignments.length; k++) {
-        logDiv.innerHTML += `[${assignments[k].category}] ${assignments[k].name}: ${assignments[k].score}%<br>`;
+        logDiv.innerHTML += `
+            <div style="margin-bottom: 5px;">
+                [${assignments[k].category}] ${assignments[k].name}: ${assignments[k].score}%
+                <button onclick="editAssignment(${assignments[k].id})" style="width: auto; padding: 2px 8px; margin-left: 10px; font-size: 0.8em; background-color: #ffc107; color: black; border-radius: 3px;">Edit</button>
+            </div>
+        `;
     }
 }
 function updateDropdown() {
@@ -92,4 +98,16 @@ function checkTotalWeight() {
     let status = document.getElementById("weightStatus");
     status.innerText = "Total Weight: " + total + "%";
     status.style.color = (total === 100) ? "green" : "red";
+}
+function editAssignment(id) {
+    let assignment = assignments.find(a => a.id === id);
+    
+    if (assignment) {
+        let newScore = prompt(`Enter new score for ${assignment.name}:`, assignment.score);
+        
+        if (newScore !== null && !isNaN(parseFloat(newScore))) {
+            assignment.score = parseFloat(newScore);
+            updateUI(); 
+        }
+    }
 }
