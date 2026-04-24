@@ -4,13 +4,12 @@ let assignments = [];
 //  category creation
 function addCategory() {
     let name = document.getElementById("catName").value;
-    let weight = parseFloat(document.getElementById("catWeight").value);
-    if (name !== "" && !isNaN(weight)) {
-        categories.push({ name: name, weight: weight });
+    let weight = parseFloat(document.getElementById("catPoints").value);
+    if (name !== "" && !isNaN(points)) {
+        categories.push({ name: name, maxPoints: points });
         updateDropdown();
-        checkTotalWeight();
         document.getElementById("catName").value = "";
-        document.getElementById("catWeight").value = "";
+        document.getElementById("catPoints").value = "";
     }
 }
 function addAssignment() {
@@ -43,12 +42,12 @@ function addAssignment() {
 
 // calculated the final grade
 function calculateFinal(catList, asList) {
-    let finalScore = 0;
-
+    let totalEarned = 0;
+    let totalPossible = 0;
 
     for (let i = 0; i < catList.length; i++) {
         let currentCat = catList[i].name;
-        let catWeight = catList[i].weight / 100;
+        let catWeight = catList[i].maxPoints;
         let catSum = 0;
         let count = 0;
 
@@ -61,34 +60,45 @@ function calculateFinal(catList, asList) {
         }
 
         if (count > 0) {
-            let catAverage = catSum / count;
-            finalScore += (catAverage * catWeight);
+            totalEarned += (catSum / count) * (catMax / 100);
         }
+        totalPossible += catMax
     }
-    return finalScore.toFixed(2);
+    let finalPercentage = (totalEarned / (totalPossible / 100));
+    return isNaN(finalPercentage) ? "0.00" : finalPercentage.toFixed(2);
 }
 
 function updateUI() {
- 
     let finalResult = calculateFinal(categories, assignments);
     document.getElementById("displayGrade").innerText = finalResult;
     
     let logDiv = document.getElementById("log");
-    logDiv.innerHTML = "<strong>Assignments added:</strong><br>";
-    for(let k = 0; k < assignments.length; k++) {
-        logDiv.innerHTML += `
-            <div style="margin-bottom: 5px;">
-                [${assignments[k].category}] ${assignments[k].name}: ${assignments[k].score}%
-                <button onclick="editAssignment(${assignments[k].id})" style="width: auto; padding: 2px 8px; margin-left: 10px; font-size: 0.8em; background-color: #ffc107; color: black; border-radius: 3px;">Edit</button>
-            </div>
-        `;
-    }
+    logDiv.innerHTML = ""; 
+
+    categories.forEach(cat => {
+        let catAssignments = assignments.filter(a => a.category === cat.name);
+        let catSum = catAssignments.reduce((sum, a) => sum + a.score, 0);
+        let catAvg = catAssignments.length > 0 ? (catSum / catAssignments.length).toFixed(2) : 0;
+
+        let section = document.createElement("div");
+        section.style.marginBottom = "20px";
+        section.innerHTML = `<strong>${cat.name} (${cat.maxPoints} pts) - Avg: ${catAvg}%</strong><br>`;
+        
+        catAssignments.forEach(a => {
+            section.innerHTML += `
+                <div style="margin-left: 10px; font-size: 0.85em;">
+                    • ${a.name}: ${a.score}% 
+                    <button onclick="editAssignment(${a.id})" style="width: auto; padding: 0px 5px; font-size: 0.7em; background-color: #ffc107;">Edit</button>
+                </div>`;
+        });
+        logDiv.appendChild(section);
+    });
 }
 function updateDropdown() {
     let select = document.getElementById("catSelect");
     select.innerHTML = '<option value="">--Select Category--</option>';
     categories.forEach(c => {
-        select.innerHTML += `<option value="${c.name}">${c.name} (${c.weight}%)</option>`;
+        select.innerHTML += `<option value="${c.name}">${c.name} (${c.maxPoints}%)</option>`;
     });
 }
 
